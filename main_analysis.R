@@ -184,6 +184,65 @@ shared_rev <- intersect(reversed_SCO, reversed_ROSI)
 write.csv(merged_SCO,  file.path(output_folder, "limma_Reversal", "SCO_reversal_genes.csv"), row.names=FALSE)
 write.csv(merged_ROSI, file.path(output_folder, "limma_Reversal", "ROSI_reversal_genes.csv"), row.names=FALSE)
 
+# --- Directionality stacked barplot for reversal genes ---
+opposite_direction_SCO <- sum(sign(merged_SCO$logFC_TNF) != sign(merged_SCO$logFC_SCO))
+same_direction_SCO <- sum(sign(merged_SCO$logFC_TNF) == sign(merged_SCO$logFC_SCO))
+opposite_direction_ROSI <- sum(sign(merged_ROSI$logFC_TNF) != sign(merged_ROSI$logFC_ROSI))
+same_direction_ROSI <- sum(sign(merged_ROSI$logFC_TNF) == sign(merged_ROSI$logFC_ROSI))
+
+legend_levels <- c(
+  "ROSI_Opposite Direction",
+  "ROSI_Same Direction",
+  "SCO_Opposite Direction",
+  "SCO_Same Direction"
+)
+bar_data <- data.frame(
+  Treatment = rep(c("ROSI", "SCO"), each = 2),
+  Direction = rep(c("Opposite Direction", "Same Direction"), 2),
+  Count = c(opposite_direction_ROSI, same_direction_ROSI,
+            opposite_direction_SCO, same_direction_SCO)
+)
+bar_data$Group <- interaction(bar_data$Treatment, bar_data$Direction, sep = "_")
+bar_data$Group <- factor(bar_data$Group, levels = legend_levels)
+
+bar_plot <- ggplot(bar_data, aes(x = Treatment, y = Count, fill = Group)) +
+  geom_bar(
+    stat = "identity",
+    position = "stack",
+    color = "black",
+    width = 0.4
+  ) +
+  scale_fill_manual(
+    values = c(
+      "ROSI_Opposite Direction" = "#ff6666",
+      "ROSI_Same Direction"     = "#FFC1C1",
+      "SCO_Opposite Direction"  = "#00E200",
+      "SCO_Same Direction"      = "#BDFCC9"
+    ),
+    labels = c("", "", "", ""),
+    name = NULL
+  ) +
+  scale_x_discrete(expand = expansion(add = 0.36), labels = NULL) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +
+  labs(title = NULL, x = NULL, y = NULL) +
+  theme_minimal(base_size = 15) +
+  theme(
+    axis.text.x = element_blank(),
+    plot.title = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_blank()
+  ) +
+  guides(fill = guide_legend(order = 1))
+
+ggsave(
+  file.path(output_folder, "limma_Reversal", "stacked_bar_overlap_directionality.png"),
+  bar_plot,
+  width = 3.5,
+  height = 6,
+  dpi = 400
+)
+
+
 #######################################################
 # SECTION 9: Venn CSVs Only (2-way and 3-way mutually exclusive)
 #######################################################
