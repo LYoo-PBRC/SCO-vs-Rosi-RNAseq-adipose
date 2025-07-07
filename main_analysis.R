@@ -76,7 +76,7 @@ y <- y[keep , , keep.lib.sizes = FALSE]
 cat("Genes after filter :", nrow(y$counts), "\n")
 
 #######################################################
-# SECTION 5: Quality Control (QC) Plots (custom colors)
+# SECTION 5: Quality Control (QC) Plots 
 #######################################################
 logCPM <- cpm(y, log = TRUE, prior.count = 3)
 df_den <- reshape2::melt(logCPM, varnames = c("Gene", "Sample"), value.name = "logCPM")
@@ -125,7 +125,7 @@ CM <- makeContrasts(
 fit2 <- eBayes(contrasts.fit(fit, CM))
 
 #######################################################
-# SECTION 7: Write DE Tables (sig and full)
+# SECTION 7: Write DE Tables 
 #######################################################
 sig_cut  <- 0.05
 limma_res <- list()
@@ -150,7 +150,7 @@ for (cn in colnames(CM)) {
 }
 
 #######################################################
-# SECTION 8: Reversal Analysis (CSV outputs, no plots)
+# SECTION 8: Reversal Analysis (CSV outputs)
 #######################################################
 tnf_threshold <- 0.05
 treatment_threshold <- 0.05
@@ -244,7 +244,7 @@ ggsave(
 
 
 #######################################################
-# SECTION 9: Venn CSVs Only (2-way and 3-way mutually exclusive)
+# SECTION 9: Venn CSVs Only (2-way and 3-way)
 #######################################################
 get_sig_genes <- function(df, pcol, fcol) {
   sig <- df[df[[pcol]] < 0.05, ]
@@ -317,7 +317,7 @@ venn_csv_file <- file.path(output_folder, "limma_Venn", "Venn_T_DMSO_ROSI_SCO.cs
 write.csv(venn_wide, venn_csv_file, row.names = FALSE)
 
 #######################################################
-# SECTION 10: FGSEA "Pretty" Barplots (WikiPathways only)
+# SECTION 10: FGSEA Barplots (WikiPathways only)
 #######################################################
 fgsea_outdir <- file.path(output_folder, "fgsea")
 if (!dir.exists(fgsea_outdir)) dir.create(fgsea_outdir, recursive = TRUE)
@@ -486,7 +486,7 @@ plot_enrichr_barplot_nolabel(enr_ROSI,   "ROSI_only",  "WikiPathways2024", outdi
 plot_enrichr_barplot_nolabel(enr_Shared, "Shared_rev", "WikiPathways2024", outdir_reversal)
 
 #######################################################
-# SECTION 12: Sanity Check / Summary Report (UNCHANGED)
+# SECTION 12: Sanity Check / Summary Report
 #######################################################
 limma_pcut    <- 0.05
 rev_tnf_cut   <- tnf_threshold
